@@ -1,0 +1,553 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.app { display: flex; flex-direction: column; height: 620px; background: var(--color-background-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+
+.navbar { background: #1e293b; color: white; padding: 0 1rem; height: 48px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.navbar .logo { font-size: 14px; font-weight: 500; color: #60a5fa; letter-spacing: 0.01em; }
+.navbar nav { display: flex; align-items: center; gap: 12px; }
+.nav-link { color: #94a3b8; font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 4px; border: none; background: transparent; }
+.nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.08); }
+.role-badge { background: #334155; color: #94a3b8; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+.logout-btn { background: transparent; border: 0.5px solid #475569; color: #94a3b8; font-size: 11px; padding: 3px 10px; border-radius: 4px; cursor: pointer; }
+.logout-btn:hover { background: #334155; color: white; }
+
+.body { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: 180px; background: var(--color-background-primary); border-right: 0.5px solid var(--color-border-tertiary); padding: 12px 8px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-item { padding: 7px 10px; border-radius: 6px; font-size: 12px; color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; border: none; background: transparent; width: 100%; text-align: left; }
+.sidebar-item:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.sidebar-item.active { background: var(--color-background-info); color: var(--color-text-info); font-weight: 500; }
+.sidebar-section { font-size: 10px; color: var(--color-text-tertiary); padding: 8px 10px 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.main { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Login */
+.login-wrap { display: flex; align-items: center; justify-content: center; height: 100%; }
+.login-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 28px 24px; width: 300px; }
+.login-box h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; text-align: center; }
+.login-box p { font-size: 12px; color: var(--color-text-secondary); text-align: center; margin-bottom: 20px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
+.form-group input, .form-group select { width: 100%; padding: 7px 10px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: 6px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+.form-group input:focus { border-color: var(--color-border-info); box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+.btn-primary { background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; width: 100%; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 5px; cursor: pointer; border: none; font-weight: 500; }
+.btn-blue { background: #2563eb; color: white; }
+.btn-blue:hover { background: #1d4ed8; }
+.btn-red { background: #ef4444; color: white; }
+.btn-red:hover { background: #dc2626; }
+.btn-ghost { background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+.btn-ghost:hover { background: var(--color-background-tertiary); }
+
+.test-accounts { background: var(--color-background-secondary); border-radius: 6px; padding: 10px; margin-top: 12px; font-size: 11px; color: var(--color-text-secondary); }
+.test-accounts strong { display: block; margin-bottom: 4px; color: var(--color-text-primary); }
+.account-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+.account-row button { font-size: 10px; padding: 2px 6px; border-radius: 3px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+.account-row button:hover { background: #2563eb; color: white; border-color: #2563eb; }
+
+/* Dashboard */
+.page-title { font-size: 16px; font-weight: 500; margin-bottom: 14px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat-card { background: var(--color-background-secondary); border-radius: 8px; padding: 12px; text-align: center; }
+.stat-val { font-size: 22px; font-weight: 500; }
+.stat-lbl { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; }
+.chart-card h3 { font-size: 12px; font-weight: 500; margin-bottom: 10px; color: var(--color-text-secondary); }
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bar { border-radius: 3px 3px 0 0; width: 100%; transition: height 0.4s; }
+.bar-lbl { font-size: 10px; color: var(--color-text-secondary); }
+.bar-val { font-size: 10px; font-weight: 500; }
+.pie-row { display: flex; flex-direction: column; gap: 6px; }
+.pie-item { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.pie-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Tasks */
+.tasks-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.filters { display: flex; gap: 8px; margin-bottom: 12px; }
+.filters input { flex: 1; padding: 6px 10px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: 6px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+.filters select { padding: 6px 8px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: 6px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+
+.task-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; border-left: 3px solid #cbd5e1; }
+.task-card.high { border-left-color: #ef4444; }
+.task-card.medium { border-left-color: #f59e0b; }
+.task-card.low { border-left-color: #22c55e; }
+.task-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.task-desc { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.task-meta { display: flex; gap: 5px; flex-wrap: wrap; }
+.badge { padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 500; }
+.badge-todo { background: #e2e8f0; color: #475569; }
+.badge-inprog { background: #dbeafe; color: #1d4ed8; }
+.badge-done { background: #dcfce7; color: #16a34a; }
+.badge-high { background: #fee2e2; color: #dc2626; }
+.badge-med { background: #fef3c7; color: #d97706; }
+.badge-low { background: #d1fae5; color: #059669; }
+.badge-user { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.task-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+/* Modal */
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 100; border-radius: var(--border-radius-lg); }
+.modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-secondary); padding: 20px; width: 320px; }
+.modal h3 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 14px; }
+.modal .form-group { margin-bottom: 10px; }
+.modal .form-group input, .modal .form-group select, .modal .form-group textarea { font-size: 12px; padding: 6px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: 6px; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; width: 100%; }
+.modal textarea { resize: none; }
+
+/* Toast */
+.toast { position: absolute; bottom: 16px; right: 16px; background: #1e293b; color: white; font-size: 12px; padding: 8px 14px; border-radius: 8px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+.empty { text-align: center; padding: 32px 0; color: var(--color-text-tertiary); font-size: 13px; }
+.warning-bar { background: #fee2e2; color: #dc2626; font-size: 11px; padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; }
+
+.pagination { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--color-text-secondary); }
+.pagination button { padding: 4px 10px; font-size: 11px; border-radius: 5px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; }
+.pagination button:disabled { opacity: 0.4; cursor: default; }
+
+/* Admin */
+.admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.admin-table th { text-align: left; padding: 6px 10px; color: var(--color-text-secondary); font-weight: 500; border-bottom: 0.5px solid var(--color-border-secondary); font-size: 11px; }
+.admin-table td { padding: 8px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.card-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px; margin-bottom: 14px; }
+.card-section h3 { font-size: 13px; font-weight: 500; margin-bottom: 10px; }
+
+.login-error { color: #dc2626; font-size: 11px; text-align: center; margin-top: 8px; display: none; }
+</style>
+
+<div class="app" id="app" style="position:relative;">
+
+  <!-- LOGIN PAGE -->
+  <div id="pg-login" class="page active" style="flex:1;padding:16px;">
+    <div class="login-wrap">
+      <div class="login-box">
+        <h2>⚡ TaskFlow Pro</h2>
+        <p>Sign in to your account</p>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" value="admin@test.com"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-pass" placeholder="••••••••" value="password123"/>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Sign In</button>
+        <div class="login-error" id="login-err">Invalid credentials. Try a test account below.</div>
+        <div class="test-accounts">
+          <strong>Test accounts</strong>
+          <div class="account-row"><span>admin@test.com</span><button onclick="quickLogin('admin@test.com','Admin')">Use</button></div>
+          <div class="account-row"><span>manager@test.com</span><button onclick="quickLogin('manager@test.com','Manager')">Use</button></div>
+          <div class="account-row"><span>employee@test.com</span><button onclick="quickLogin('employee@test.com','Employee')">Use</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SHELL (navbar + sidebar + content) -->
+  <div id="shell" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+    <div class="navbar">
+      <div class="logo">⚡ TaskFlow Pro</div>
+      <nav>
+        <button class="nav-link" onclick="goPage('dashboard')">Dashboard</button>
+        <button class="nav-link" onclick="goPage('tasks')">Tasks</button>
+        <button class="nav-link" id="admin-nav-btn" onclick="goPage('admin')" style="display:none">Admin</button>
+        <span class="role-badge" id="nav-role">admin</span>
+        <span style="color:#94a3b8;font-size:11px;" id="nav-name">Admin User</span>
+        <button class="logout-btn" onclick="doLogout()">Logout</button>
+      </nav>
+    </div>
+    <div class="body">
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-section">Menu</div>
+        <button class="sidebar-item" onclick="goPage('dashboard')">📊 Dashboard</button>
+        <button class="sidebar-item" onclick="goPage('tasks')">✅ Tasks</button>
+        <button class="sidebar-item" id="admin-sidebar-btn" onclick="goPage('admin')" style="display:none">🛡 Admin Panel</button>
+        <div class="sidebar-section" style="margin-top:auto;">Filters</div>
+        <button class="sidebar-item" onclick="filterStatus('')">All tasks</button>
+        <button class="sidebar-item" onclick="filterStatus('todo')">📋 Todo</button>
+        <button class="sidebar-item" onclick="filterStatus('in-progress')">🔄 In progress</button>
+        <button class="sidebar-item" onclick="filterStatus('done')">✔ Done</button>
+      </div>
+      <div class="main">
+        <!-- DASHBOARD -->
+        <div id="pg-dashboard" class="page">
+          <div class="page-title" id="dash-title">Dashboard</div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val" id="st-total" style="color:#2563eb">5</div><div class="stat-lbl">Total tasks</div></div>
+            <div class="stat-card"><div class="stat-val" id="st-done" style="color:#22c55e">1</div><div class="stat-lbl">Done</div></div>
+            <div class="stat-card"><div class="stat-val" id="st-prog" style="color:#f59e0b">2</div><div class="stat-lbl">In progress</div></div>
+            <div class="stat-card"><div class="stat-val" id="st-todo" style="color:#64748b">2</div><div class="stat-lbl">Todo</div></div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-card">
+              <h3>Tasks by status</h3>
+              <div class="bar-chart" id="bar-chart"></div>
+            </div>
+            <div class="chart-card">
+              <h3>Tasks by priority</h3>
+              <div class="pie-row" id="pie-chart"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TASKS -->
+        <div id="pg-tasks" class="page">
+          <div class="tasks-header">
+            <div class="page-title" style="margin:0">Tasks</div>
+            <button class="btn-sm btn-blue" id="new-task-btn" onclick="openModal()" style="display:none">+ New Task</button>
+          </div>
+          <div id="high-warn" class="warning-bar" style="display:none">⚠️ High priority tasks need attention</div>
+          <div class="filters">
+            <input type="text" id="search-input" placeholder="Search tasks... (press Enter)" onkeydown="if(event.key==='Enter')renderTasks()"/>
+            <select id="status-filter" onchange="renderTasks()">
+              <option value="">All status</option>
+              <option value="todo">Todo</option>
+              <option value="in-progress">In progress</option>
+              <option value="done">Done</option>
+            </select>
+            <select id="priority-filter" onchange="renderTasks()">
+              <option value="">All priority</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div id="task-list"></div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+
+        <!-- ADMIN -->
+        <div id="pg-admin" class="page">
+          <div class="page-title">Admin Panel</div>
+          <div class="card-section">
+            <h3>Users</h3>
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Tasks</th></tr></thead>
+              <tbody id="users-table"></tbody>
+            </table>
+          </div>
+          <div class="card-section">
+            <h3>API reference</h3>
+            <table class="admin-table">
+              <thead><tr><th>Method</th><th>Endpoint</th><th>Access</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge badge-inprog">GET</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/auth/me</td><td>Authenticated</td></tr>
+                <tr><td><span class="badge badge-done">POST</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/auth/login</td><td>Public</td></tr>
+                <tr><td><span class="badge badge-inprog">GET</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/tasks</td><td>All roles</td></tr>
+                <tr><td><span class="badge badge-done">POST</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/tasks</td><td>Admin, Manager</td></tr>
+                <tr><td><span class="badge badge-med">PUT</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/tasks/:id</td><td>All roles</td></tr>
+                <tr><td><span class="badge badge-high">DELETE</span></td><td style="font-family:var(--font-mono);font-size:11px">/api/tasks/:id</td><td>Admin, Manager</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal" style="display:none">
+    <div class="modal">
+      <h3 id="modal-title">Create Task</h3>
+      <div class="form-group"><label>Title</label><input id="m-title" placeholder="Task title"/></div>
+      <div class="form-group"><label>Description</label><textarea id="m-desc" rows="2" placeholder="Optional description"></textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="form-group"><label>Status</label>
+          <select id="m-status"><option value="todo">Todo</option><option value="in-progress">In progress</option><option value="done">Done</option></select>
+        </div>
+        <div class="form-group"><label>Priority</label>
+          <select id="m-priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Assign to</label>
+        <select id="m-assignee">
+          <option value="1">Admin User (admin)</option>
+          <option value="2">Manager User (manager)</option>
+          <option value="3">Employee User (employee)</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-sm btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn-sm btn-blue" onclick="saveTask()">Save task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const USERS = {
+  'admin@test.com':    { id:'1', name:'Admin User',    role:'admin',    pass:'password123' },
+  'manager@test.com':  { id:'2', name:'Manager User',  role:'manager',  pass:'password123' },
+  'employee@test.com': { id:'3', name:'Employee User', role:'employee', pass:'password123' }
+};
+
+const ALL_USERS = [
+  { id:'1', name:'Admin User',    email:'admin@test.com',    role:'admin'    },
+  { id:'2', name:'Manager User',  email:'manager@test.com',  role:'manager'  },
+  { id:'3', name:'Employee User', email:'employee@test.com', role:'employee' },
+];
+
+let tasks = [
+  { id:'t1', title:'Set up CI/CD pipeline',          desc:'Configure GitHub Actions for deployment', status:'todo',        priority:'high',   assignedTo:'3', createdBy:'1' },
+  { id:'t2', title:'Write unit tests for auth',       desc:'Cover register, login, token verify',    status:'in-progress', priority:'high',   assignedTo:'3', createdBy:'2' },
+  { id:'t3', title:'Design dashboard UI mockup',      desc:'Create Figma mockups for analytics',     status:'done',        priority:'medium', assignedTo:'2', createdBy:'1' },
+  { id:'t4', title:'Optimize database queries',       desc:'Add indexes and review slow queries',     status:'todo',        priority:'medium', assignedTo:'3', createdBy:'1' },
+  { id:'t5', title:'Update project documentation',    desc:'Update README and API docs',             status:'in-progress', priority:'low',    assignedTo:'3', createdBy:'2' },
+];
+
+let currentUser = null;
+let editTaskId = null;
+let currentPage = 1;
+const PAGE_SIZE = 3;
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value.trim();
+  const u = USERS[email];
+  if (u && u.pass === pass) {
+    currentUser = u;
+    document.getElementById('login-err').style.display = 'none';
+    showShell();
+    goPage('dashboard');
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function quickLogin(email, role) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-pass').value = 'password123';
+  doLogin();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('shell').style.display = 'none';
+  document.getElementById('pg-login').classList.add('active');
+  document.getElementById('login-err').style.display = 'none';
+  toast('Logged out successfully');
+}
+
+function showShell() {
+  document.getElementById('pg-login').classList.remove('active');
+  const shell = document.getElementById('shell');
+  shell.style.display = 'flex';
+  document.getElementById('nav-role').textContent = currentUser.role;
+  document.getElementById('nav-name').textContent = currentUser.name;
+  const isAdmin = currentUser.role === 'admin';
+  const canCreate = isAdmin || currentUser.role === 'manager';
+  document.getElementById('admin-nav-btn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('admin-sidebar-btn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('new-task-btn').style.display = canCreate ? '' : 'none';
+}
+
+function goPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-' + page).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (page === 'dashboard') { renderDashboard(); document.querySelectorAll('.nav-link')[0].classList.add('active'); }
+  if (page === 'tasks')     { renderTasks();     document.querySelectorAll('.nav-link')[1].classList.add('active'); }
+  if (page === 'admin')     { renderAdmin();     }
+}
+
+function getVisibleTasks() {
+  let t = tasks;
+  if (currentUser.role === 'employee') t = t.filter(x => x.assignedTo === currentUser.id);
+  return t;
+}
+
+function renderDashboard() {
+  const t = getVisibleTasks();
+  const done = t.filter(x => x.status === 'done').length;
+  const prog = t.filter(x => x.status === 'in-progress').length;
+  const todo = t.filter(x => x.status === 'todo').length;
+  document.getElementById('st-total').textContent = t.length;
+  document.getElementById('st-done').textContent = done;
+  document.getElementById('st-prog').textContent = prog;
+  document.getElementById('st-todo').textContent = todo;
+  document.getElementById('dash-title').textContent = 'Welcome, ' + currentUser.name;
+
+  // Bar chart
+  const maxV = Math.max(todo, prog, done, 1);
+  const bars = [
+    { label:'Todo', val:todo, color:'#94a3b8' },
+    { label:'In Progress', val:prog, color:'#3b82f6' },
+    { label:'Done', val:done, color:'#22c55e' },
+  ];
+  document.getElementById('bar-chart').innerHTML = bars.map(b => `
+    <div class="bar-wrap">
+      <div class="bar-val">${b.val}</div>
+      <div class="bar" style="height:${Math.max(8, b.val/maxV*60)}px;background:${b.color}"></div>
+      <div class="bar-lbl">${b.label}</div>
+    </div>
+  `).join('');
+
+  // Pie (legend style)
+  const high = t.filter(x => x.priority === 'high').length;
+  const med  = t.filter(x => x.priority === 'medium').length;
+  const low  = t.filter(x => x.priority === 'low').length;
+  const pItems = [
+    { label:'High',   val:high, color:'#ef4444' },
+    { label:'Medium', val:med,  color:'#f59e0b' },
+    { label:'Low',    val:low,  color:'#22c55e' },
+  ];
+  document.getElementById('pie-chart').innerHTML = pItems.map(p => `
+    <div class="pie-item">
+      <div class="pie-dot" style="background:${p.color}"></div>
+      <div style="flex:1;color:var(--color-text-secondary)">${p.label}</div>
+      <div style="font-weight:500">${p.val}</div>
+      <div style="background:var(--color-background-secondary);border-radius:4px;width:60px;height:10px;overflow:hidden;margin-left:6px">
+        <div style="height:100%;width:${t.length?p.val/t.length*100:0}%;background:${p.color};border-radius:4px"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTasks() {
+  let t = getVisibleTasks();
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const sf = document.getElementById('status-filter').value;
+  const pf = document.getElementById('priority-filter').value;
+  if (search) t = t.filter(x => x.title.toLowerCase().includes(search) || (x.desc||'').toLowerCase().includes(search));
+  if (sf) t = t.filter(x => x.status === sf);
+  if (pf) t = t.filter(x => x.priority === pf);
+
+  const highCount = t.filter(x => x.priority === 'high').length;
+  document.getElementById('high-warn').style.display = highCount > 0 ? '' : 'none';
+
+  const total = t.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > pages) currentPage = 1;
+  const slice = t.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  const canDelete = currentUser.role === 'admin' || currentUser.role === 'manager';
+
+  if (slice.length === 0) {
+    document.getElementById('task-list').innerHTML = '<div class="empty">No tasks found</div>';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('task-list').innerHTML = slice.map(task => {
+    const assignee = ALL_USERS.find(u => u.id === task.assignedTo);
+    const sClass = task.status === 'in-progress' ? 'badge-inprog' : task.status === 'done' ? 'badge-done' : 'badge-todo';
+    const pClass = task.priority === 'high' ? 'badge-high' : task.priority === 'medium' ? 'badge-med' : 'badge-low';
+    return `<div class="task-card ${task.priority}">
+      <div>
+        <div class="task-title">${task.title}</div>
+        ${task.desc ? `<div class="task-desc">${task.desc}</div>` : ''}
+        <div class="task-meta">
+          <span class="badge ${sClass}">${task.status}</span>
+          <span class="badge ${pClass}">${task.priority}</span>
+          ${assignee ? `<span class="badge badge-user">👤 ${assignee.name}</span>` : ''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn-sm btn-ghost" onclick="openEdit('${task.id}')">Edit</button>
+        ${canDelete ? `<button class="btn-sm btn-red" onclick="deleteTask('${task.id}')">Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Pagination
+  document.getElementById('pagination').innerHTML = pages > 1 ? `
+    <button onclick="changePage(-1)" ${currentPage===1?'disabled':''}>← Prev</button>
+    <span>Page ${currentPage} of ${pages} (${total} tasks)</span>
+    <button onclick="changePage(1)" ${currentPage===pages?'disabled':''}>Next →</button>
+  ` : `<span>${total} task${total!==1?'s':''}</span>`;
+}
+
+function changePage(d) { currentPage += d; renderTasks(); }
+
+function filterStatus(s) {
+  document.getElementById('status-filter').value = s;
+  currentPage = 1;
+  goPage('tasks');
+  renderTasks();
+}
+
+function openModal() {
+  editTaskId = null;
+  document.getElementById('modal-title').textContent = 'Create Task';
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-desc').value = '';
+  document.getElementById('m-status').value = 'todo';
+  document.getElementById('m-priority').value = 'medium';
+  document.getElementById('m-assignee').value = '3';
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function openEdit(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  editTaskId = id;
+  document.getElementById('modal-title').textContent = 'Edit Task';
+  document.getElementById('m-title').value = task.title;
+  document.getElementById('m-desc').value = task.desc || '';
+  document.getElementById('m-status').value = task.status;
+  document.getElementById('m-priority').value = task.priority;
+  document.getElementById('m-assignee').value = task.assignedTo;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+function saveTask() {
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { toast('Title is required'); return; }
+  if (editTaskId) {
+    const t = tasks.find(x => x.id === editTaskId);
+    t.title = title;
+    t.desc = document.getElementById('m-desc').value;
+    t.status = document.getElementById('m-status').value;
+    t.priority = document.getElementById('m-priority').value;
+    t.assignedTo = document.getElementById('m-assignee').value;
+    toast('Task updated');
+  } else {
+    tasks.unshift({ id: 't' + Date.now(), title, desc: document.getElementById('m-desc').value, status: document.getElementById('m-status').value, priority: document.getElementById('m-priority').value, assignedTo: document.getElementById('m-assignee').value, createdBy: currentUser.id });
+    toast('Task created');
+  }
+  closeModal();
+  renderTasks();
+  renderDashboard();
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  toast('Task deleted');
+  renderTasks();
+  renderDashboard();
+}
+
+function renderAdmin() {
+  const rows = ALL_USERS.map(u => {
+    const count = tasks.filter(t => t.assignedTo === u.id).length;
+    const rb = u.role === 'admin' ? 'badge-high' : u.role === 'manager' ? 'badge-med' : 'badge-low';
+    return `<tr>
+      <td>${u.name}</td>
+      <td style="color:var(--color-text-secondary)">${u.email}</td>
+      <td><span class="badge ${rb}">${u.role}</span></td>
+      <td>${count}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('users-table').innerHTML = rows;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
