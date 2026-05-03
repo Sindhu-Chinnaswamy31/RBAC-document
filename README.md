@@ -5,9 +5,7 @@ Node.js v18+
 MongoDB running locally (or a MongoDB Atlas URI)
 
 
-Step 1 — Unzip & open the project
-bashunzip taskflow-pro.zip
-cd taskflow-pro
+Step 1 — cd taskflow-pro
 
 Step 2 — Configure the backend
 bashcd server
